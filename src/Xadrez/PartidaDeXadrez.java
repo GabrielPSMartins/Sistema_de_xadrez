@@ -9,6 +9,7 @@ import Xadrez.pecas.Torre;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PartidaDeXadrez {
 
@@ -16,6 +17,7 @@ public class PartidaDeXadrez {
     private int turno;
     private Cor jogadorAtual;
     private Tabuleiro tabuleiro;
+    private boolean check;
 
     private List<Peca> pecasNoTabuleiro = new ArrayList<>();
     private List<Peca> pecasCapturadas = new ArrayList<>();
@@ -33,6 +35,10 @@ public class PartidaDeXadrez {
 
     public Cor getJogadorAtual() {
         return jogadorAtual;
+    }
+
+    public boolean getCheck() {
+        return check;
     }
 
     public PecaDeXadrez[][] getPecas() {
@@ -57,6 +63,14 @@ public class PartidaDeXadrez {
         validarPosicaoOrigem(origem);
         validarPosicaoDestino(origem, destino);
         Peca pecaCapturada = realizarMovimento(origem, destino);
+
+        if (testeCheck(jogadorAtual)) {
+            desvazerMovimento(origem, destino, pecaCapturada);
+            throw new ExcecaoXadrez("Você não pode se colocar em xeque.");
+        }
+
+        check = (testeCheck(oponente(jogadorAtual))) ? true : false;
+
         proximoTurno();
         return (PecaDeXadrez) pecaCapturada;
     }
@@ -74,27 +88,64 @@ public class PartidaDeXadrez {
         return pecaCapturada;
     }
 
+    private void desvazerMovimento(Posicao origem, Posicao destino, Peca pecaCapturada) {
+        Peca p = tabuleiro.removerPeca(destino);
+        tabuleiro.colocarPeca(p, origem);
+
+        if (pecaCapturada != null) {
+            tabuleiro.colocarPeca(pecaCapturada, destino);
+            pecasCapturadas.remove(pecaCapturada);
+            pecasNoTabuleiro.add(pecaCapturada);
+        }
+    }
+
     private void validarPosicaoOrigem(Posicao posicao) {
         if(!tabuleiro.pecaExiste(posicao)) {
-            throw new ExcecaoXadrez("Não existe peça na posição de origem");
+            throw new ExcecaoXadrez("Não existe peça na posição de origem.");
         }
         if (jogadorAtual != ((PecaDeXadrez)tabuleiro.peca(posicao)).getCor()) {
-            throw new ExcecaoXadrez("A peça escolhida não é sua");
+            throw new ExcecaoXadrez("A peça escolhida não é sua.");
         }
         if (!tabuleiro.peca(posicao).existeAlgumMovimentoPossivel()) {
-            throw new ExcecaoXadrez("Não existe movimentos possíveis para a peça escolhida");
+            throw new ExcecaoXadrez("Não existe movimentos possíveis para a peça escolhida.");
         }
     }
 
     private void validarPosicaoDestino(Posicao origem, Posicao destino) {
         if (!tabuleiro.peca(origem).possivelMovimento(destino)) {
-            throw new ExcecaoXadrez("A peça escolhida não pode se mover para a posição de destino");
+            throw new ExcecaoXadrez("A peça escolhida não pode se mover para a posição de destino.");
         }
     }
 
     private void proximoTurno() {
         turno++;
         jogadorAtual = (jogadorAtual == Cor.BRANCAS) ? Cor.PRETAS : Cor.BRANCAS;
+    }
+
+    private Cor oponente(Cor cor) {
+        return (cor == Cor.BRANCAS) ? Cor.PRETAS : Cor.BRANCAS;
+    }
+
+    private PecaDeXadrez rei(Cor cor) {
+        List<Peca> list = pecasNoTabuleiro.stream().filter(x -> ((PecaDeXadrez)x).getCor() == cor).collect(Collectors.toList());
+        for (Peca p : list) {
+            if (p instanceof Rei) {
+                return (PecaDeXadrez) p;
+            }
+        }
+        throw new IllegalStateException("Não existe o rei da cor " + cor + " no tabuleiro.");
+    }
+
+    private boolean testeCheck(Cor cor) {
+        Posicao posicaoRei = rei(cor).getPosicaoXadrez().toPosicao();
+        List<Peca> pecasOponente = pecasNoTabuleiro.stream().filter(x -> ((PecaDeXadrez)x).getCor() == oponente(cor)).collect(Collectors.toList());
+        for (Peca p : pecasOponente) {
+            boolean [][] mat = p.possiveisMovimentos();
+            if (mat[posicaoRei.getLinha()][posicaoRei.getColuna()]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void colocarNovaPeca(char coluna, int linha, PecaDeXadrez peca) {
