@@ -37,6 +37,7 @@ public class UI {
         System.out.print("\033[H\033[2J");
         System.out.flush();
     }
+
     public static PosicaoXadrez lerPosicaoXadrez(Scanner sc) {
         try {
             String s = sc.nextLine();
@@ -55,12 +56,16 @@ public class UI {
         printCapturarPeca(capturadas);
         System.out.println();
         System.out.println("Turno: " + partidaDeXadrez.getTurno());
-        System.out.println("Esperando o jogador: " + partidaDeXadrez.getJogadorAtual());
-        if (partidaDeXadrez.getCheck()) {
-            System.out.println("Você está em check");
+        if (!partidaDeXadrez.getXequeMate()) {
+            System.out.println("Esperando o jogador: " + partidaDeXadrez.getJogadorAtual());
+            if (partidaDeXadrez.getXeque()) {
+                System.out.println("Você está em xeque.");
+            }
+        } else {
+            System.out.println("Você recebeu um xeque-mate.");
+            System.out.println("Vencedor: " + partidaDeXadrez.getJogadorAtual());
         }
     }
-
     public static void printTabuleiro(PecaDeXadrez[][] pecas) {
         for (int i=0; i<pecas.length; i++) {
             System.out.print((8 - i) + " ");
