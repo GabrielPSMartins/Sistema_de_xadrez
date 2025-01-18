@@ -21,11 +21,11 @@ O **Sistema de xadrez** é um jogo de xadrez jogado no console, onde você pode 
 
 ## Como Executar 💻
 
-Para executar o **Chess System** em sua máquina local, siga as etapas abaixo:
+Para executar o **Sistema de xadrez** em sua máquina local, siga as etapas abaixo:
 
 1. **Clone** este repositório:
    ```bash
-   git clone https://github.com/seu-usuario/chess-system.git
+   git clone https://github.com/GabrielPSMartins/Sistema_de_xadrez
 
    ## Como Executar 💻
 
