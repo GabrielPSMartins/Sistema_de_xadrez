@@ -1,4 +1,4 @@
-# Sistema de Xadrez 🎮♟️
+# Sistema de Xadrez Em Java🎮♟️
 
 **Sistema de xadrez** é o meu primeiro projeto público no GitHub, desenvolvido como parte do curso de Java do Udemy do professor Nelio Alves. Este projeto marca o início de vários projetos que ainda irão vir. Este projeto, como o nome já diz, é um sistema de xadrez funcional criado em Java. 
 
